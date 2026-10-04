@@ -1,0 +1,9 @@
+{
+  "model_version": "url-lexical-0.2.0",
+  "feature_version": "url-lexical-v1",
+  "model_sha256": "06350173d0c12a3a46845f859affc5e16a9db312a4a02c2fea62a64edfe7a6ec",
+  "metrics_sha256": "c3c1c601c093dadedcdb31fab96fe270537e98627d15144dae75d7582370323b",
+  "feature_schema_sha256": "1cd0f6b446ab288c4e50423020723ffcda7d75fde15e832a92ecc1b59da14600",
+  "training_script_sha256": "9e154563d9be8de86cdd4dcbf70fb3902a370e38ed573e8b4886e4d3c6c2337a",
+  "feature_code_sha256": "213c1e1153813515b74ea8aa6f8ec2d52556853f118da30382b4e2f03114ccf0"
+}

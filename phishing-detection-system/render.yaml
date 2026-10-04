@@ -1,0 +1,40 @@
+# FREE deployment blueprint. Place at the ROOT of the repo.
+# Render Dashboard -> New -> Blueprint -> pick the repo.
+# Database is NOT here: use a free Neon Postgres and paste its URL as DATABASE_URL.
+# (The paid all-in-Render version is saved as render.paid.yaml.)
+services:
+  - type: web
+    name: phishguard-ml
+    runtime: docker
+    plan: free
+    dockerfilePath: ./docker/ml-service.Dockerfile
+    dockerContext: ./ml-service
+    healthCheckPath: /ready
+    envVars:
+      - key: ML_ENV
+        value: production
+      - key: PORT
+        value: "8000"
+
+  - type: web
+    name: phishguard-backend
+    runtime: docker
+    plan: free
+    dockerfilePath: ./docker/backend.Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /api/v1/live
+    envVars:
+      - { key: NODE_ENV, value: production }
+      - { key: PORT, value: "4000" }
+      - { key: AUTH_COOKIE_SECURE, value: "true" }
+      - { key: AUTH_COOKIE_SAMESITE, value: lax }
+      - { key: TRUST_PROXY_HOPS, value: "2" }
+      - { key: ML_SERVICE_TIMEOUT_MS, value: "55000" }
+      - key: DATABASE_URL        # paste your Neon connection string
+        sync: false
+      - key: ML_SERVICE_URL      # paste https://<your-ml-service>.onrender.com (https!)
+        sync: false
+      - key: JWT_SECRET          # paste a random 96-char secret
+        sync: false
+      - key: CORS_ORIGIN         # set to https://<your-app>.vercel.app after the Vercel deploy
+        sync: false
