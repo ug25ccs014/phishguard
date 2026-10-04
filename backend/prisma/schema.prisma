@@ -1,0 +1,155 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum RiskLevel {
+  LOW_RISK
+  SUSPICIOUS
+  HIGH_RISK
+  LIKELY_PHISHING
+  KNOWN_MALICIOUS
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  CONFIRMED
+  REJECTED
+}
+
+model User {
+  id                String         @id @default(cuid())
+  email             String         @unique
+  name              String
+  passwordHash      String
+  role              UserRole       @default(USER)
+  highRiskAlerts    Boolean        @default(true)
+  weeklySummary     Boolean        @default(false)
+  passwordChangedAt DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  scans             Scan[]
+  reports           PhishingReport[]
+  sessions          AuthSession[]
+  reviewedReports   PhishingReport[] @relation("ReportReviewer")
+
+  @@index([createdAt])
+}
+
+model AuthSession {
+  id          String    @id @default(cuid())
+  userId      String
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  lastUsedAt  DateTime?
+  userAgent   String?
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@index([revokedAt, expiresAt])
+}
+
+model Scan {
+  id                           String       @id @default(cuid())
+  userId                       String?
+  url                          String
+  normalizedUrl                String
+  domain                       String
+  verdict                      RiskLevel?
+  riskScore                    Int?
+  modelVersion                 String?
+  createdAt                    DateTime     @default(now())
+  user                         User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  result                       ScanResult?
+  threatIntelligenceRecords   ThreatIntelligenceRecord[]
+
+  @@index([userId, createdAt])
+  @@index([domain])
+  @@index([verdict, createdAt])
+  @@index([userId, verdict, createdAt])
+}
+
+model ScanResult {
+  id                       String   @id @default(cuid())
+  scanId                   String   @unique
+  mlSignal                 String?
+  heuristicSignal          String?
+  threatIntelligenceSignal String?
+  domainSignal             String?
+  dnsTlsSignal             String?
+  mlProbability            Float?
+  featuresJson             Json?
+  modelName                String?
+  featureVersion           String?
+  topModelFeaturesJson     Json?
+  methodology              String?
+  reasonsJson              Json?
+  recommendation           String?
+  threatIntelligenceJson   Json?
+  domainIntelligenceJson   Json?
+  riskBreakdownJson        Json?
+  coverageJson             Json?
+  createdAt                DateTime @default(now())
+  scan                     Scan     @relation(fields: [scanId], references: [id], onDelete: Cascade)
+}
+
+model ThreatIntelligenceRecord {
+  id          String   @id @default(cuid())
+  scanId      String?
+  url         String
+  source      String
+  status      String
+  firstSeen   DateTime?
+  lastSeen    DateTime?
+  rawSummary  Json?
+  createdAt   DateTime @default(now())
+  scan        Scan?    @relation(fields: [scanId], references: [id], onDelete: Cascade)
+
+  @@index([scanId])
+  @@index([url, source])
+  @@index([createdAt])
+}
+
+model PhishingReport {
+  id            String       @id @default(cuid())
+  userId        String?
+  url           String
+  category      String
+  description   String?
+  status        ReportStatus @default(PENDING)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  reviewedAt    DateTime?
+  reviewedById  String?
+  reviewNote    String?
+  user          User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  reviewedBy    User?        @relation("ReportReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([reviewedById, reviewedAt])
+
+  @@index([status, createdAt])
+  @@index([userId, createdAt])
+}
+
+model ModelVersion {
+  id              String   @id @default(cuid())
+  name            String
+  version         String   @unique
+  dataset         String?
+  featureVersion  String?
+  metrics         Json?
+  createdAt       DateTime @default(now())
+
+  @@index([createdAt])
+}

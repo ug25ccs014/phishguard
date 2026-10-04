@@ -1,0 +1,32 @@
+{
+  "version": "url-lexical-v1",
+  "features": [
+    "url_length",
+    "hostname_length",
+    "path_length",
+    "query_length",
+    "fragment_length",
+    "domain_length",
+    "tld_length",
+    "path_depth",
+    "query_parameter_count",
+    "dot_count",
+    "slash_count",
+    "hyphen_count",
+    "underscore_count",
+    "digit_count",
+    "special_character_count",
+    "percent_encoded_count",
+    "at_symbol",
+    "double_slash_redirect",
+    "has_ip_hostname",
+    "has_punycode",
+    "subdomain_count",
+    "suspicious_term_count",
+    "suspicious_term_ratio",
+    "hostname_entropy",
+    "url_entropy",
+    "uses_shortener",
+    "https"
+  ]
+}

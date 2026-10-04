@@ -1,0 +1,90 @@
+services:
+  postgres:
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    image: postgres:16.15-alpine3.24@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-phishguard}
+      POSTGRES_USER: ${POSTGRES_USER:-phishguard}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env before starting Compose}
+    volumes:
+      - phishguard_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  ml-service:
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    build:
+      context: ./ml-service
+      dockerfile: ../docker/ml-service.Dockerfile
+    expose:
+      - "8000"
+
+  backend:
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend.Dockerfile
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 4000
+      TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-0}
+      HOST: 0.0.0.0
+      APP_VERSION: ${APP_VERSION:-0.5.0}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:8080}
+      DATABASE_URL: ${DOCKER_DATABASE_URL:?Set DOCKER_DATABASE_URL in .env before starting Compose}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env before starting Compose}
+      AUTH_COOKIE_NAME: phishguard_access
+      CSRF_COOKIE_NAME: phishguard_csrf
+      AUTH_COOKIE_SAMESITE: lax
+      AUTH_COOKIE_SECURE: ${AUTH_COOKIE_SECURE:-false}
+      AUTH_SESSION_TTL_HOURS: 12
+      ML_SERVICE_URL: http://ml-service:8000
+      PHISHTANK_ENABLED: "true"
+      OPENPHISH_ENABLED: "true"
+      VIRUSTOTAL_ENABLED: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ml-service:
+        condition: service_healthy
+    ports:
+      - "4000:4000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4000/api/v1/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+
+  frontend:
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    build:
+      context: ./frontend
+      dockerfile: ../docker/frontend.Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:4000/api/v1}
+        VITE_CSRF_COOKIE_NAME: ${CSRF_COOKIE_NAME:-phishguard_csrf}
+    ports:
+      - "8080:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  phishguard_pgdata:

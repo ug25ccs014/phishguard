@@ -1,0 +1,394 @@
+{
+  "model_version": "url-lexical-0.2.0",
+  "feature_version": "url-lexical-v1",
+  "selected_model": "logistic-regression",
+  "label_definition": {
+    "0": "LEGITIMATE",
+    "1": "PHISHING"
+  },
+  "dataset": {
+    "path": "ml-service/data/bootstrap_urls.csv",
+    "source": "bootstrap-template",
+    "rows": 3600,
+    "class_counts": {
+      "0": 1800,
+      "1": 1800
+    },
+    "bootstrap": true,
+    "audit": {
+      "raw_valid_rows": 3600,
+      "canonical_duplicate_groups": 0,
+      "duplicate_rows_removed": 0,
+      "rows_after_deduplication": 3600,
+      "conflicting_canonical_urls": 0,
+      "unique_groups": 1274
+    }
+  },
+  "evaluation_protocol": {
+    "strategy": "stratified_group_holdout",
+    "group_key": "hostname",
+    "duplicate_policy": "canonical_url_deduplicate_and_reject_label_conflicts",
+    "random_seed": 20261002,
+    "split": {
+      "method": "StratifiedGroupKFold",
+      "n_splits": 5,
+      "train_rows": 2212,
+      "validation_rows": 694,
+      "test_rows": 694,
+      "train_groups": 739,
+      "validation_groups": 269,
+      "test_groups": 266,
+      "group_overlap": {
+        "train_validation": 0,
+        "train_test": 0,
+        "validation_test": 0
+      },
+      "class_counts": {
+        "train": {
+          "0": 1132,
+          "1": 1080
+        },
+        "validation": {
+          "0": 334,
+          "1": 360
+        },
+        "test": {
+          "0": 334,
+          "1": 360
+        }
+      }
+    }
+  },
+  "validation_model_comparison": [
+    {
+      "model": "logistic-regression",
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "roc_auc": 1.0,
+      "confusion_matrix": [
+        [
+          334,
+          0
+        ],
+        [
+          0,
+          360
+        ]
+      ],
+      "false_positive_rate": 0.0,
+      "false_negative_rate": 0.0,
+      "classification_report": {
+        "0": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 334.0
+        },
+        "1": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 360.0
+        },
+        "accuracy": 1.0,
+        "macro avg": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 694.0
+        },
+        "weighted avg": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 694.0
+        }
+      }
+    },
+    {
+      "model": "random-forest",
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "roc_auc": 1.0,
+      "confusion_matrix": [
+        [
+          334,
+          0
+        ],
+        [
+          0,
+          360
+        ]
+      ],
+      "false_positive_rate": 0.0,
+      "false_negative_rate": 0.0,
+      "classification_report": {
+        "0": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 334.0
+        },
+        "1": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 360.0
+        },
+        "accuracy": 1.0,
+        "macro avg": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 694.0
+        },
+        "weighted avg": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 694.0
+        }
+      }
+    },
+    {
+      "model": "xgboost",
+      "accuracy": 0.994236,
+      "precision": 0.989011,
+      "recall": 1.0,
+      "f1": 0.994475,
+      "roc_auc": 1.0,
+      "confusion_matrix": [
+        [
+          330,
+          4
+        ],
+        [
+          0,
+          360
+        ]
+      ],
+      "false_positive_rate": 0.011976,
+      "false_negative_rate": 0.0,
+      "classification_report": {
+        "0": {
+          "precision": 1.0,
+          "recall": 0.9880239520958084,
+          "f1-score": 0.9939759036144579,
+          "support": 334.0
+        },
+        "1": {
+          "precision": 0.989010989010989,
+          "recall": 1.0,
+          "f1-score": 0.994475138121547,
+          "support": 360.0
+        },
+        "accuracy": 0.9942363112391931,
+        "macro avg": {
+          "precision": 0.9945054945054945,
+          "recall": 0.9940119760479043,
+          "f1-score": 0.9942255208680024,
+          "support": 694.0
+        },
+        "weighted avg": {
+          "precision": 0.9942996484783229,
+          "recall": 0.9942363112391931,
+          "f1-score": 0.9942348725230344,
+          "support": 694.0
+        }
+      }
+    }
+  ],
+  "test_metrics": {
+    "model": "logistic-regression",
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "roc_auc": 1.0,
+    "confusion_matrix": [
+      [
+        334,
+        0
+      ],
+      [
+        0,
+        360
+      ]
+    ],
+    "false_positive_rate": 0.0,
+    "false_negative_rate": 0.0,
+    "classification_report": {
+      "0": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 334.0
+      },
+      "1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 360.0
+      },
+      "accuracy": 1.0,
+      "macro avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 694.0
+      },
+      "weighted avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 694.0
+      }
+    }
+  },
+  "feature_names": [
+    "url_length",
+    "hostname_length",
+    "path_length",
+    "query_length",
+    "fragment_length",
+    "domain_length",
+    "tld_length",
+    "path_depth",
+    "query_parameter_count",
+    "dot_count",
+    "slash_count",
+    "hyphen_count",
+    "underscore_count",
+    "digit_count",
+    "special_character_count",
+    "percent_encoded_count",
+    "at_symbol",
+    "double_slash_redirect",
+    "has_ip_hostname",
+    "has_punycode",
+    "subdomain_count",
+    "suspicious_term_count",
+    "suspicious_term_ratio",
+    "hostname_entropy",
+    "url_entropy",
+    "uses_shortener",
+    "https"
+  ],
+  "feature_importance": [
+    {
+      "feature": "suspicious_term_ratio",
+      "importance": 0.104505
+    },
+    {
+      "feature": "has_ip_hostname",
+      "importance": 0.08488
+    },
+    {
+      "feature": "hyphen_count",
+      "importance": 0.084618
+    },
+    {
+      "feature": "suspicious_term_count",
+      "importance": 0.08423
+    },
+    {
+      "feature": "at_symbol",
+      "importance": 0.069134
+    },
+    {
+      "feature": "digit_count",
+      "importance": 0.065359
+    },
+    {
+      "feature": "https",
+      "importance": 0.061575
+    },
+    {
+      "feature": "hostname_length",
+      "importance": 0.055476
+    },
+    {
+      "feature": "domain_length",
+      "importance": 0.055476
+    },
+    {
+      "feature": "url_length",
+      "importance": 0.054096
+    },
+    {
+      "feature": "special_character_count",
+      "importance": 0.052243
+    },
+    {
+      "feature": "hostname_entropy",
+      "importance": 0.045884
+    },
+    {
+      "feature": "query_parameter_count",
+      "importance": 0.039644
+    },
+    {
+      "feature": "dot_count",
+      "importance": 0.032075
+    },
+    {
+      "feature": "url_entropy",
+      "importance": 0.028447
+    },
+    {
+      "feature": "query_length",
+      "importance": 0.025991
+    },
+    {
+      "feature": "tld_length",
+      "importance": 0.014338
+    },
+    {
+      "feature": "percent_encoded_count",
+      "importance": 0.010203
+    },
+    {
+      "feature": "subdomain_count",
+      "importance": 0.009032
+    },
+    {
+      "feature": "slash_count",
+      "importance": 0.007396
+    },
+    {
+      "feature": "path_depth",
+      "importance": 0.006596
+    },
+    {
+      "feature": "double_slash_redirect",
+      "importance": 0.00539
+    },
+    {
+      "feature": "path_length",
+      "importance": 0.003412
+    },
+    {
+      "feature": "fragment_length",
+      "importance": 0.0
+    },
+    {
+      "feature": "underscore_count",
+      "importance": 0.0
+    },
+    {
+      "feature": "has_punycode",
+      "importance": 0.0
+    },
+    {
+      "feature": "uses_shortener",
+      "importance": 0.0
+    }
+  ],
+  "probability_calibrated": false,
+  "source_note": "Bootstrap template corpus generated locally because this build environment has no outbound network. These metrics validate the runnable pipeline only; they are not a production benchmark.",
+  "random_seed": 20261002
+}
