@@ -3,7 +3,7 @@ import type { AdminModelResponse, AdminOverviewResponse, AdminProvider, AuthUser
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000/api/v1',
-  timeout: 20_000,
+  timeout: 70_000,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 })

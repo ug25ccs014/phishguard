@@ -2,9 +2,5 @@ fastapi==0.128.2
 uvicorn[standard]==0.48.0
 pydantic==2.13.4
 numpy==2.3.5
-pandas==2.2.3
 scikit-learn==1.8.0
-xgboost==3.1.3
 joblib==1.5.3
-shap==0.50.0
-ucimlrepo==0.0.7
