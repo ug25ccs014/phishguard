@@ -1,7 +1,7 @@
 import type { RequestHandler } from 'express'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../lib/prisma.js'
-import { createUserSession, destroyCurrentSession, passwordHash, verifyPassword, type AuthUser, getAuthenticatedUser, issueCsrfCookie } from '../services/auth.js'
+import { createUserSession, destroyCurrentSession, hashPassword, verifyPassword, type AuthUser, getAuthenticatedUser, issueCsrfCookie } from '../services/auth.js'
 import { loginSchema, passwordChangeSchema, profileSchema, registerSchema } from '../validators/auth.js'
 
 export const issueCsrf: RequestHandler = async (_req, res) => {
@@ -19,7 +19,7 @@ export const register: RequestHandler = async (req, res, next) => {
     const existing = await prisma.user.findUnique({ where: { email: input.email }, select: { id: true } })
     if (existing) return res.status(409).json({ error: { code: 'EMAIL_IN_USE', message: 'An account with this email already exists.' } })
     const userRecord = await prisma.user.create({
-      data: { email: input.email, name: input.name, passwordHash: await passwordHash(input.password) },
+      data: { email: input.email, name: input.name, passwordHash: await hashPassword(input.password) },
     })
     const user: AuthUser = { id: userRecord.id, email: userRecord.email, name: userRecord.name, role: userRecord.role, highRiskAlerts: userRecord.highRiskAlerts, weeklySummary: userRecord.weeklySummary }
     await createUserSession(user, req, res)
@@ -67,7 +67,7 @@ export const changePassword: RequestHandler = async (req, res, next) => {
     if (!record || !await verifyPassword(input.currentPassword, record.passwordHash)) return res.status(400).json({ error: { code: 'CURRENT_PASSWORD_INVALID', message: 'Current password is incorrect.' } })
     if (await verifyPassword(input.newPassword, record.passwordHash)) return res.status(400).json({ error: { code: 'PASSWORD_REUSE', message: 'Choose a new password that differs from the current password.' } })
     await prisma.$transaction([
-      prisma.user.update({ where: { id: record.id }, data: { passwordHash: await passwordHash(input.newPassword), passwordChangedAt: new Date() } }),
+      prisma.user.update({ where: { id: record.id }, data: { passwordHash: await hashPassword(input.newPassword), passwordChangedAt: new Date() } }),
       prisma.authSession.updateMany({ where: { userId: record.id, revokedAt: null }, data: { revokedAt: new Date() } }),
     ])
     return res.status(204).send()

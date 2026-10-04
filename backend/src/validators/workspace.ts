@@ -36,3 +36,7 @@ export const adminReportsQuerySchema = z.object({
   status: z.nativeEnum(ReportStatus).optional(),
   search: z.string().trim().max(160).optional(),
 })
+
+export const idParamSchema = z.object({
+  id: z.string().trim().min(1).max(128),
+})
